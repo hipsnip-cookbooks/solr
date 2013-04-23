@@ -2,6 +2,8 @@
 
 Chef cookbook for setting up Apache Solr from mirrors.
 
+[![Build Status](https://travis-ci.org/hipsnip-cookbooks/solr.png?branch=master)](https://travis-ci.org/hipsnip-cookbooks/solr)
+
 ## Requirements
 
 Built to run on Linux distributions. Tested on Ubuntu 12.04.
