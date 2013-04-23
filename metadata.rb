@@ -1,3 +1,4 @@
+name			 "hipsnip-solr"
 maintainer       "HipSnip"
 maintainer_email "adam@hipsnip.com/remy@hipsnip.com"
 license          "Apache 2.0"

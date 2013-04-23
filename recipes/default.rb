@@ -59,7 +59,7 @@ ruby_block 'Copy Solr war into Jetty webapps folder' do
   end
 
   action :create
-  notifies :restart, resources(:service => "jetty")
+  notifies :restart, "service[jetty]"
 
   not_if do
     if not ::File.exists?(::File.join(node['solr']['webapps'], node['solr']['war']))
@@ -72,10 +72,10 @@ ruby_block 'Copy Solr war into Jetty webapps folder' do
   end
 end
 
-# template "#{node.jetty.contexts}/solr.xml" do
+# template "#{node['jetty']['contexts']}/solr.xml" do
 #   owner  node['jetty']['user']
 #   source "solr.context.erb"
-#   notifies :restart, resources(:service => "jetty")
+#   notifies :restart, "service[jetty]"
 # end
 
 directory node['solr']['data'] do
@@ -107,7 +107,7 @@ ruby_block 'Copy Solr configurations files' do
   end
 
   action :create
-  notifies :restart, resources(:service => "jetty")
+  notifies :restart, "service[jetty]"
 
   not_if do
     if not ::File.exists?(::File.join(node['solr']['config'], 'solrconfig.xml'))
@@ -123,7 +123,7 @@ end
 ######################################################################################
 # Set log level
 
-# directory node.solr.log_dir do
+# directory node['solr']['log_dir'] do
 #   owner node['jetty']['user']
 #   group node['jetty']['group']
 #   mode  '755'
@@ -132,5 +132,5 @@ end
 template "#{node['jetty']['home']}/etc/logging.properties" do
   source 'logging.properties.erb'
   mode '644'
-  notifies :restart, resources(:service => 'jetty')
+  notifies :restart, "service[jetty]"
 end
