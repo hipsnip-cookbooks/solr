@@ -21,6 +21,36 @@ include_recipe "hipsnip-jetty"
 
 require 'fileutils'
 
+################################################################################
+# Create Solr home directory
+
+directory node['solr']['home'] do
+  owner node['jetty']['user']
+  group node['jetty']['group']
+  mode "755"
+  recursive true
+  action :create
+end
+
+################################################################################
+# Guess few node attributes if not set based on the given solr version in
+# node['solr']['version']
+
+if node['solr']['link'].empty?
+  if /^3\.[0-9]{1,}\.[0-9]{1,}/.match(node['solr']['version'])
+    node.default['solr']['link'] = "http://apache.mirrors.timporter.net/lucene/solr/#{node['solr']['version']}/apache-solr-#{node['solr']['version']}.tgz"
+    node.default['solr']['download'] = "#{node['solr']['directory']}/apache-solr-#{node['solr']['version']}.tgz"
+    node.default['solr']['extracted'] = "#{node['solr']['directory']}/apache-solr-#{node['solr']['version']}"
+    node.default['solr']['war'] = "apache-solr-#{node['solr']['version']}.war"
+  elsif /^4\.[0-9]{1,}\.[0-9]{1,}/.match(node['solr']['version'])
+    node.default['solr']['link'] = "http://apache.mirrors.timporter.net/lucene/solr/#{node['solr']['version']}/solr-#{node['solr']['version']}.tgz"
+    node.default['solr']['download'] = "#{node['solr']['directory']}/solr-#{node['solr']['version']}.tgz"
+    node.default['solr']['extracted'] = "#{node['solr']['directory']}/solr-#{node['solr']['version']}"
+    node.default['solr']['war'] = "solr-#{node['solr']['version']}.war"
+  else
+    # throw here!
+  end
+end
 
 ################################################################################
 # Download and unpack
@@ -36,13 +66,13 @@ ruby_block 'Extract Solr' do
   block do
     Chef::Log.info "Extracting Solr archive #{node['solr']['download']} into #{node['solr']['directory']}"
     `tar xzf #{node['solr']['download']} -C #{node['solr']['directory']}`
-    raise "Failed to extract Solr package" unless ::File.exists?(node['solr']['extracted'])
+    raise "Failed to extract Solr package" unless File.exists?(node['solr']['extracted'])
   end
 
   action :create
 
   not_if do
-    ::File.exists?(node['solr']['extracted'])
+    File.exists?(node['solr']['extracted'])
   end
 end
 
@@ -51,32 +81,32 @@ end
 
 ruby_block 'Copy Solr war into Jetty webapps folder' do
   block do
-    Chef::Log.info "Copying #{node['solr']['war']} into #{node['solr']['webapps']}"
+    Chef::Log.info "Copying #{node['solr']['war']} into #{node['jetty']['contexts']}"
 
-    ::FileUtils.cp ::File.join(node['solr']['extracted'], 'solr/dist', node['solr']['war']), node['solr']['webapps']
+    FileUtils.cp(File.join(node['solr']['extracted'],'dist',node['solr']['war']),File.join(node['jetty']['webapps'],node['solr']['war']))
 
-    raise "Failed to copy Solr war" unless ::File.exists?(::File.join(node['solr']['webapps'], node['solr']['war']))
+    raise "Failed to copy Solr war" unless File.exists?(File.join(node['jetty']['webapps'],node['solr']['war']))
   end
 
   action :create
   notifies :restart, "service[jetty]"
 
   not_if do
-    if not ::File.exists?(::File.join(node['solr']['webapps'], node['solr']['war']))
+    if not File.exists?(File.join(node['jetty']['webapps'],node['solr']['war']))
       false
     else
-      downloaded_signature = `sha256sum #{node['solr']['extracted']}/solr/dist/#{node['solr']['war']} | cut -d ' ' -f 1`
-      installed_signature = `sha256sum #{node['solr']['webapps']}/#{node['solr']['war']} | cut -d ' ' -f 1`
+      downloaded_signature = `sha256sum #{node['solr']['extracted']}/dist/#{node['solr']['war']} | cut -d ' ' -f 1`
+      installed_signature = `sha256sum #{node['jetty']['webapps']}/#{node['solr']['war']} | cut -d ' ' -f 1`
       downloaded_signature == installed_signature
     end
   end
 end
 
-# template "#{node['jetty']['contexts']}/solr.xml" do
-#   owner  node['jetty']['user']
-#   source "solr.context.erb"
-#   notifies :restart, "service[jetty]"
-# end
+template "#{node['jetty']['webapps']}/solr.xml" do
+  owner  node['jetty']['user']
+  source "solr.context.erb"
+  notifies :restart, "service[jetty]"
+end
 
 directory node['solr']['data'] do
   owner node['jetty']['user']
@@ -90,31 +120,24 @@ end
 ################################################################################
 # Configure
 
-directory node['solr']['config'] do
-  owner node['jetty']['user']
-  group node['jetty']['group']
-  mode "755"
-  recursive true
-  action :create
-end
-
 ruby_block 'Copy Solr configurations files' do
   block do
-    config_files = Dir.glob(::File.join(node['solr']['extracted'],'/solr/example/solr/conf/') + '**')
-    Chef::Log.info "Copying #{config_files} into #{node['solr']['config']}"
-    ::FileUtils.cp_r config_files, node['solr']['config']
-    raise "Failed to copy Solr configurations files" unless ::File.exists?(::File.join(node['solr']['config'], 'solrconfig.xml'))
+    config_files = Dir.glob(File.join(node['solr']['extracted'],'/example/solr/') + '**')
+    Chef::Log.info "Copying #{config_files} into #{node['solr']['home']}"
+    FileUtils.cp_r(config_files, "#{node['solr']['home']}/")
+    FileUtils.chown_R(node['jetty']['user'],node['jetty']['group'],node['solr']['home'])
+    raise "Failed to copy Solr configurations files" unless File.exists?(File.join(node['solr']['home'], 'solr.xml'))
   end
 
   action :create
   notifies :restart, "service[jetty]"
 
   not_if do
-    if not ::File.exists?(::File.join(node['solr']['config'], 'solrconfig.xml'))
+    if not File.exists?(File.join(node['solr']['home'], 'solr.xml'))
       false
     else
-      downloaded_signature = `sha256sum #{node['solr']['extracted']}/solr/dist/#{node['solr']['war']} | cut -d ' ' -f 1`
-      installed_signature = `sha256sum #{node['solr']['webapps']}/#{node['solr']['war']} | cut -d ' ' -f 1`
+      downloaded_signature = `sha256sum #{node['solr']['extracted']}/dist/#{node['solr']['war']} | cut -d ' ' -f 1`
+      installed_signature = `sha256sum #{node['jetty']['webapps']}/#{node['solr']['war']} | cut -d ' ' -f 1`
       downloaded_signature == installed_signature
     end
   end

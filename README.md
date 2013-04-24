@@ -17,29 +17,31 @@ Otherwise you should not need to override others attributes.
 ## Attributes
 
 ```
-['solr']['version']   = "3.6.2"
-# url of the solr archive (tar.gz)
-#
-['solr']['link']      = "http://apache.mirrors.timporter.net/lucene/solr/#{solr.version}/apache-solr-#{solr.version}.tgz"
-# sha265sum of the solr archive, used to check the integrity of the archive
-['solr']['checksum']  = "537426dcbdd0dc82dd5bf16b48b6bcaf87cb4049c1245eea8dcb79eeaf3e7ac6"
-# directory where the archive will be downloaded
+['solr']['version'] = "3.6.2"
+# sha256 sum of the solr archive
+['solr']['checksum'] = "537426dcbdd0dc82dd5bf16b48b6bcaf87cb4049c1245eea8dcb79eeaf3e7ac6"
+# directory where solr archive is downloaded and extracted
 ['solr']['directory'] = "/usr/local/src"
-# path of the solr archive
-['solr']['download']  = "#{solr.directory}/apache-solr-#{solr.version}.tgz"
-# path of the solr source after extraction
-['solr']['extracted'] = "#{solr.directory}/apache-solr-#{solr.version}"
-# name of the solr war extracted
-['solr']['war']       = "apache-solr-#{solr.version}.war"
 
-# home directory of the Solr server
-['solr']['home']      = "/usr/share/solr"
-# path of the folder containing solr configuration files
-['solr']['config']    =  "#{node.solr.home}/conf"
-# path of the folder containing solr index
-['solr']['data']      = "/usr/local/solr/data"
+# Guess by the cookbook if empty
+['solr']['link'] = ""
+['solr']['download'] = ""
+['solr']['extracted'] = ""
+['solr']['war'] = ""
+['solr']['dist'] = ""
 
-# log level (SEVERE WARNING INFO CONFIG FINE FINER FINEST)
+# location of solr (configuration files)
+['solr']['home'] = "/usr/share/solr"
+# location of the indexes
+['solr']['data'] = "/usr/local/solr/data"
+
+['solr']['context_path'] = '/solr'
+['solr']['env_vars'] = {
+	'solr.solr.home' => node['solr']['home'],
+	'solr.data.dir' => node['solr']['data']
+}
+
+# SEVERE (highest value) WARNING INFO CONFIG FINE FINER FINEST (lowest value)
 ['solr']['log']['level'] = 'FINE'
 ['solr']['log']['class'] = 'java.util.logging.ConsoleHandler'
 ['solr']['log']['formatter'] = 'java.util.logging.SimpleFormatter'

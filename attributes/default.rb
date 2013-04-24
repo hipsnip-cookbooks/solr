@@ -18,16 +18,23 @@
 #
 
 default['solr']['version'] = "3.6.2"
-default['solr']['link'] = "http://apache.mirrors.timporter.net/lucene/solr/#{node['solr']['version']}/apache-solr-#{node['solr']['version']}.tgz"
 default['solr']['checksum'] = "537426dcbdd0dc82dd5bf16b48b6bcaf87cb4049c1245eea8dcb79eeaf3e7ac6" #sha265
 default['solr']['directory'] = "/usr/local/src"
-default['solr']['download'] = "#{node['solr']['directory']}/apache-solr-#{node['solr']['version']}.tgz"
-default['solr']['extracted'] = "#{node['solr']['directory']}/apache-solr-#{node['solr']['version']}"
-default['solr']['war'] = "apache-solr-#{node['solr']['version']}.war"
+
+default['solr']['link'] = ""
+default['solr']['download'] = ""
+default['solr']['extracted'] = ""
+default['solr']['war'] = ""
+default['solr']['dist'] = ""
 
 default['solr']['home'] = "/usr/share/solr"
-default['solr']['config'] =  "#{node['solr']['home']}/conf"
 default['solr']['data'] = "/usr/local/solr/data"
+
+default['solr']['context_path'] = '/solr'
+default['solr']['env_vars'] = {
+	'solr.solr.home' => node['solr']['home'],
+	'solr.data.dir' => node['solr']['data']
+}
 
 # SEVERE (highest value) WARNING INFO CONFIG FINE FINER FINEST (lowest value)
 default['solr']['log']['level'] = 'FINE'

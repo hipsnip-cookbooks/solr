@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/hipsnip-cookbooks/cookbook-development.git
-  revision: 067e67db2f898b8d24032ceba5fed74c264b6963
+  revision: 2e3e9165b44b86b89737534b7f84070d22e74db8
   specs:
     cookbook-development (0.1.1)
       chef (~> 11.4.0)
@@ -37,7 +37,7 @@ GEM
     builder (3.2.0)
     celluloid (0.13.0)
       timers (>= 1.0.0)
-    chef (11.4.2)
+    chef (11.4.4)
       erubis
       highline (>= 1.6.9)
       json (>= 1.4.4, <= 1.7.7)
@@ -86,7 +86,7 @@ GEM
       ffi (>= 1.0.1)
     gyoku (1.0.0)
       builder (>= 2.1.2)
-    hashie (2.0.3)
+    hashie (2.0.4)
     highline (1.6.18)
     httparty (0.11.0)
       multi_json (~> 1.0)
@@ -191,7 +191,7 @@ GEM
     strainer (2.0.0)
       berkshelf (~> 1.3)
     systemu (2.5.2)
-    test-kitchen (1.0.0.alpha.4)
+    test-kitchen (1.0.0.alpha.5)
       celluloid
       mixlib-shellout
       net-scp

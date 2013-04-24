@@ -1,0 +1,12 @@
+<?xml version="1.0"  encoding="ISO-8859-1"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+  <% for @key in node['solr']['env_vars'].keys.sort -%>
+    <Call class="java.lang.System" name="setProperty">
+      <Arg><%= @key %></Arg>
+      <Arg><%= node['solr']['env_vars'][@key] %></Arg>
+    </Call>
+  <% end -%>
+  <Set name="contextPath">/solr</Set>
+  <Set name="war"><SystemProperty name="jetty.home" default="."/>/webapps/<%= node['solr']['war'] %></Set>
+</Configure>
