@@ -41,11 +41,12 @@ describe_recipe "hipsnip-jetty::default" do
     assert_instance_of(Net::HTTPOK,response,'HTTP response of the ping')
   end
   it "should be possible to query Solr" do
-    uri = URI("http://127.0.0.1:#{node.jetty.port}/solr/collection1/select?q=*:*&wt=json")
-    response = Net::HTTP.get_response(uri)
+    collection = get_default_collection
+    response = query_documents(collection,'*','*')
     assert_instance_of(Net::HTTPOK,response,'HTTP response of the query command')
   end
   it "should be possible to add documents into Solr" do
+    collection = get_default_collection
     data = [
       {
         'id' => '1',
@@ -56,10 +57,11 @@ describe_recipe "hipsnip-jetty::default" do
         'title' => 'title2'
       }
     ]
-    response = add_documents(data)
+    response = add_documents(collection,data)
     assert_instance_of(Net::HTTPOK,response,'HTTP response of the add command')
   end
   it "should be possible to query documents just added in Solr and delete them after" do
+    collection = get_default_collection
     documents = [
       {
         'id' => '10',
@@ -70,26 +72,27 @@ describe_recipe "hipsnip-jetty::default" do
         'title' => 'random20'
       }
     ]
-    add_response = add_documents(documents)
+    add_response = add_documents(collection,documents)
     assert_instance_of(Net::HTTPOK,add_response,'HTTP response of the add command')
-    query_response = query_documents('title','random*')
+    query_response = query_documents(collection,'title','random*')
     assert_instance_of(Net::HTTPOK,query_response,'HTTP response of the query command')
-    delete_response = delete_documents('title','random*')
+    delete_response = delete_documents(collection,'title','random*')
     assert_instance_of(Net::HTTPOK,delete_response,'HTTP response of the delete command')
     data = JSON.parse(query_response.body)
     assert_equal(0,data['responseHeader']['status'],'status of the Solr query')
     assert_equal(2,data['response']['numFound'],'number of products found')
   end
   it "should be possible to delete documents in Solr" do
-    response = delete_documents('title','title*')
+    collection = get_default_collection
+    response = delete_documents(collection,'title','title*')
     assert_instance_of(Net::HTTPOK,response,'HTTP response of the delete command')
   end
 
   ################################################################################################
   # Helpers for Solr
 
-  def add_documents(documents)
-    uri = URI("http://127.0.0.1:#{node.jetty.port}/solr/collection1/update/json?commit=true&wt=json")
+  def add_documents(collection,documents)
+    uri = URI("http://127.0.0.1:#{node.jetty.port}/solr#{collection}/update/json?commit=true&wt=json")
     http = Net::HTTP.new(uri.host,uri.port)
     body = documents.to_json
     request = Net::HTTP::Post.new(uri.path + '?' + uri.query)
@@ -100,14 +103,14 @@ describe_recipe "hipsnip-jetty::default" do
     return response
   end
 
-  def query_documents(field,value)
-    uri = URI("http://127.0.0.1:#{node.jetty.port}/solr/collection1/select?q=#{field}:#{value}&wt=json")
+  def query_documents(collection,field,value)
+    uri = URI("http://127.0.0.1:#{node.jetty.port}/solr#{collection}/select?q=#{field}:#{value}&wt=json")
     response = Net::HTTP.get_response(uri)
     return response
   end
 
-  def delete_documents(field,value)
-    uri = URI("http://127.0.0.1:#{node.jetty.port}/solr/collection1/update/json?commit=true&wt=json")
+  def delete_documents(collection,field,value)
+    uri = URI("http://127.0.0.1:#{node.jetty.port}/solr#{collection}/update/json?commit=true&wt=json")
     http = Net::HTTP.new(uri.host,uri.port)
     data = {
       'delete' => {
@@ -121,6 +124,15 @@ describe_recipe "hipsnip-jetty::default" do
     request['Content-Length'] = body.bytesize
     response = http.request(request)
     return response
+  end
+
+  def get_default_collection
+    # on Solr 4 the default collection is not at the root
+    collection = ''
+    if /^4\.[0-9]{1,}\.[0-9]{1,}/.match(node['solr']['version'])
+      collection = '/collection1'
+    end
+    return collection
   end
 end
 

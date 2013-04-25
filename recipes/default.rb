@@ -81,10 +81,10 @@ end
 
 ruby_block 'Copy Solr war into Jetty webapps folder' do
   block do
-    Chef::Log.info "Copying #{node['solr']['war']} into #{node['jetty']['contexts']}"
+    Chef::Log.info "Copying #{node['solr']['war']} into #{node['jetty']['webapps']}"
 
     FileUtils.cp(File.join(node['solr']['extracted'],'dist',node['solr']['war']),File.join(node['jetty']['webapps'],node['solr']['war']))
-
+    FileUtils.chown_R(node['jetty']['user'],node['jetty']['group'],File.join(node['jetty']['webapps'],node['solr']['war']))
     raise "Failed to copy Solr war" unless File.exists?(File.join(node['jetty']['webapps'],node['solr']['war']))
   end
 
@@ -102,8 +102,10 @@ ruby_block 'Copy Solr war into Jetty webapps folder' do
   end
 end
 
-template "#{node['jetty']['webapps']}/solr.xml" do
-  owner  node['jetty']['user']
+template "#{node['jetty']['contexts']}/solr.xml" do
+  owner node['jetty']['user']
+  group node['jetty']['group']
+  mode "644"
   source "solr.context.erb"
   notifies :restart, "service[jetty]"
 end
