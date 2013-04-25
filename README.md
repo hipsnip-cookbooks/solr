@@ -1,6 +1,6 @@
 # hipsnip-solr
 
-Chef cookbook for setting up Apache Solr from mirrors.
+Chef cookbook for setting up Apache Solr 3.6.x/4.x from mirrors.
 
 [![Build Status](https://travis-ci.org/hipsnip-cookbooks/solr.png?branch=master)](https://travis-ci.org/hipsnip-cookbooks/solr)
 
@@ -11,8 +11,23 @@ Depends on the `hipsnip-jetty` cookbook.
 
 ## Usage
 
-By default the Jetty server setups thanks to the `hipsnip-jetty` cookbook set the port number to 8080, so do not forget to override `node[:jetty][:port]` in your role or env to run the Solr server on the port that you wish (reminder: the standard port for Solr is 8983).
-Otherwise you should not need to override others attributes.
+For example if you want to install Solr 4.2, you will have to edit the attributes as following:
+
+```
+attributes:
+    solr:
+      version: 4.2.1
+      checksum: 648a4b2509f6bcac83554ca5958cf607474e81f34e6ed3a0bc932ea7fac40b99
+    jetty:
+      port: 8983
+      version: 9.0.2.v20130417
+      link: http://eclipse.org/downloads/download.php?file=/jetty/stable-9/dist/jetty-distribution-9.0.2.v20130417.tar.gz&r=1
+      checksum: 6ab0c0ba4ff98bfc7399a82a96a047fcd2161ae46622e36a3552ecf10b9cddb9
+    java:
+      jdk_version: 7
+```
+
+For more usage examples, read the configuration file of kitchen called `.kitchen.yml`. Each test suite describes a valid way to use this cookbook.
 
 ## Attributes
 
