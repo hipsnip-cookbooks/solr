@@ -2,7 +2,7 @@
 
 Chef cookbook for setting up Apache Solr 3.6.x/4.x from mirrors.
 
-[![Build Status](https://travis-ci.org/hipsnip-cookbooks/solr.png?branch=master)](https://travis-ci.org/hipsnip-cookbooks/solr)
+[![Build Status](https://travis-ci.org/hipsnip-cookbooks/solr.png?branch=master)](https://travis-ci.org/hipsnip-cookbooks/solr) [![Dependency Status](https://gemnasium.com/hipsnip-cookbooks/solr.png)](https://gemnasium.com/hipsnip-cookbooks/solr)
 
 ## Requirements
 
