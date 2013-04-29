@@ -25,7 +25,6 @@ default['solr']['link'] = ""
 default['solr']['download'] = ""
 default['solr']['extracted'] = ""
 default['solr']['war'] = ""
-default['solr']['dist'] = ""
 
 default['solr']['home'] = "/usr/share/solr"
 default['solr']['data'] = "/usr/local/solr/data"

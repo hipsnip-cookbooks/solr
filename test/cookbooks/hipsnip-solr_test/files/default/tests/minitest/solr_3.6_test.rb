@@ -1,12 +1,12 @@
 require File.expand_path('../support/helpers', __FILE__)
 require 'net/http'
 
-describe_recipe "hipsnip-jetty::default" do
+describe_recipe "hipsnip-jetty_test::solr_3.6" do
   include Helpers::CookbookTest
 
   # is Jetty up?
   before do
-    uri = URI("http://127.0.0.1:#{node.jetty.port}/solr/")
+    uri = URI("http://127.0.0.1:#{node['jetty']['port']}/solr/")
     attempts_total = 3;
     attempts_remaining = attempts_total
     wait_between_attempt = 10
@@ -35,18 +35,23 @@ describe_recipe "hipsnip-jetty::default" do
     response = Net::HTTP.get_response(uri)
     assert_instance_of(Net::HTTPOK, response,"HTTP response on the Solr root")
   end
+
   it "should be possible to ping Solr admin" do
     uri = URI("http://127.0.0.1:#{node.jetty.port}/solr/admin/ping?wt=json")
     response = Net::HTTP.get_response(uri)
     assert_instance_of(Net::HTTPOK,response,'HTTP response of the ping')
   end
+
   it "should be possible to query Solr" do
-    collection = get_default_collection
-    response = query_documents(collection,'*','*')
+    client = Helpers::Solr::Client.new('127.0.0.1',node['jetty']['port'])
+    client.collection = client.get_default_collection(node['solr']['version'])
+    response = client.query_documents('*','*')
     assert_instance_of(Net::HTTPOK,response,'HTTP response of the query command')
   end
+
   it "should be possible to add documents into Solr" do
-    collection = get_default_collection
+    client = Helpers::Solr::Client.new('127.0.0.1',node['jetty']['port'])
+    client.collection = client.get_default_collection(node['solr']['version'])
     data = [
       {
         'id' => '1',
@@ -57,11 +62,13 @@ describe_recipe "hipsnip-jetty::default" do
         'title' => 'title2'
       }
     ]
-    response = add_documents(collection,data)
+    response = client.add_documents(data)
     assert_instance_of(Net::HTTPOK,response,'HTTP response of the add command')
   end
+
   it "should be possible to query documents just added in Solr and delete them after" do
-    collection = get_default_collection
+    client = Helpers::Solr::Client.new('127.0.0.1',node['jetty']['port'])
+    client.collection = client.get_default_collection(node['solr']['version'])
     documents = [
       {
         'id' => '10',
@@ -72,67 +79,22 @@ describe_recipe "hipsnip-jetty::default" do
         'title' => 'random20'
       }
     ]
-    add_response = add_documents(collection,documents)
+    add_response = client.add_documents(documents)
     assert_instance_of(Net::HTTPOK,add_response,'HTTP response of the add command')
-    query_response = query_documents(collection,'title','random*')
+    query_response = client.query_documents('title','random*')
     assert_instance_of(Net::HTTPOK,query_response,'HTTP response of the query command')
-    delete_response = delete_documents(collection,'title','random*')
+    delete_response = client.delete_documents('title','random*')
     assert_instance_of(Net::HTTPOK,delete_response,'HTTP response of the delete command')
     data = JSON.parse(query_response.body)
     assert_equal(0,data['responseHeader']['status'],'status of the Solr query')
     assert_equal(2,data['response']['numFound'],'number of products found')
   end
+
   it "should be possible to delete documents in Solr" do
-    collection = get_default_collection
-    response = delete_documents(collection,'title','title*')
+    client = Helpers::Solr::Client.new('127.0.0.1',node['jetty']['port'])
+    client.collection = client.get_default_collection(node['solr']['version'])
+    response = client.delete_documents('title','title*')
     assert_instance_of(Net::HTTPOK,response,'HTTP response of the delete command')
   end
 
-  ################################################################################################
-  # Helpers for Solr
-
-  def add_documents(collection,documents)
-    uri = URI("http://127.0.0.1:#{node.jetty.port}/solr#{collection}/update/json?commit=true&wt=json")
-    http = Net::HTTP.new(uri.host,uri.port)
-    body = documents.to_json
-    request = Net::HTTP::Post.new(uri.path + '?' + uri.query)
-    request.body = body
-    request['Content-Type'] = 'application/json'
-    request['Content-Length'] = body.bytesize
-    response = http.request(request)
-    return response
-  end
-
-  def query_documents(collection,field,value)
-    uri = URI("http://127.0.0.1:#{node.jetty.port}/solr#{collection}/select?q=#{field}:#{value}&wt=json")
-    response = Net::HTTP.get_response(uri)
-    return response
-  end
-
-  def delete_documents(collection,field,value)
-    uri = URI("http://127.0.0.1:#{node.jetty.port}/solr#{collection}/update/json?commit=true&wt=json")
-    http = Net::HTTP.new(uri.host,uri.port)
-    data = {
-      'delete' => {
-        'query' => "#{field}:#{value}"
-      }
-    }
-    body = data.to_json
-    request = Net::HTTP::Post.new(uri.path + '?' + uri.query)
-    request.body = body
-    request['Content-Type'] = 'application/json'
-    request['Content-Length'] = body.bytesize
-    response = http.request(request)
-    return response
-  end
-
-  def get_default_collection
-    # on Solr 4 the default collection is not at the root
-    collection = ''
-    if /^4\.[0-9]{1,}\.[0-9]{1,}/.match(node['solr']['version'])
-      collection = '/collection1'
-    end
-    return collection
-  end
 end
-
