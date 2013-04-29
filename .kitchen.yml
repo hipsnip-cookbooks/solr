@@ -28,3 +28,10 @@ suites:
   attributes:
     minitest:
       tests: "hipsnip-solr_test/solr_3.6_test.rb"
+- name: use-syslog
+  run_list:
+    - recipe[hipsnip-solr_test::use_syslog]
+    - recipe[minitest-handler]
+  attributes:
+    minitest:
+      tests: "hipsnip-solr_test/use_syslog_test.rb"
