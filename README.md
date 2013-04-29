@@ -39,9 +39,9 @@ For more usage examples, have a look to the recipes in `test/cookbooks/hipsnip-s
 * `node['solr']['data']` - directory where indexes are stored, default "/usr/local/solr/data"
 
 * `node['solr']['context_path']` - route where Solr is deployed, default '/solr'
-* `node['solr']['env_vars']` -  variables passed to Solr, default {'solr.solr.home' => node['solr']['home'],'solr.data.dir' => node['solr']['data']}
+* `node['solr']['env_vars']` -  variables passed to Solr, default "{'solr.solr.home' => node['solr']['home'],'solr.data.dir' => node['solr']['data']}".
 
-* `node['solr']['log']['level']` -  log level, default 'FINE'
+* `node['solr']['log']['level']` -  log level , default "INFO". levels: SEVERE ERROR WARNING INFO CONFIG FINE FINER FINEST
 * `node['solr']['log']['class']` - log class used, default 'java.util.logging.ConsoleHandler'. This class logs messages into stdout/stderr.
 * `node['solr']['log']['formatter']` - log formatter used, default 'java.util.logging.SimpleFormatter'
 
