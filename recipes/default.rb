@@ -159,3 +159,5 @@ template "#{node['jetty']['home']}/etc/logging.properties" do
   mode '644'
   notifies :restart, "service[jetty]"
 end
+
+node.set['jetty']['java_options'] = node['jetty']['java_options'] + ' -Djava.util.logging.config.file=logging.properties '
