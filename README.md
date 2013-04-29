@@ -11,56 +11,48 @@ Depends on the `hipsnip-jetty` cookbook.
 
 ## Usage
 
-For example if you want to install Solr 4.2, you will have to edit the attributes as following:
+For example if you want to install Solr 4.2, you could create a cookbook with a recipe containing this code:
 
 ```
-attributes:
-    solr:
-      version: 4.2.1
-      checksum: 648a4b2509f6bcac83554ca5958cf607474e81f34e6ed3a0bc932ea7fac40b99
-    jetty:
-      port: 8983
-      version: 9.0.2.v20130417
-      link: http://eclipse.org/downloads/download.php?file=/jetty/stable-9/dist/jetty-distribution-9.0.2.v20130417.tar.gz&r=1
-      checksum: 6ab0c0ba4ff98bfc7399a82a96a047fcd2161ae46622e36a3552ecf10b9cddb9
-    java:
-      jdk_version: 7
+node.set['solr']['version'] = '4.2.1'
+node.set['solr']['checksum'] = '648a4b2509f6bcac83554ca5958cf607474e81f34e6ed3a0bc932ea7fac40b99'
+
+node.set['jetty']['port'] = 8983
+node.set['jetty']['version'] = '9.0.2.v20130417'
+node.set['jetty']['link'] = 'http://eclipse.org/downloads/download.php?file=/jetty/stable-9/dist/jetty-distribution-9.0.2.v20130417.tar.gz&r=1'
+node.set['jetty']['checksum'] = '6ab0c0ba4ff98bfc7399a82a96a047fcd2161ae46622e36a3552ecf10b9cddb9'
+
+node.set['java']['jdk_version'] = 7
+
+include_recipe 'hipsnip-solr'7
 ```
 
-For more usage examples, read the configuration file of kitchen called `.kitchen.yml`. Each test suite describes a valid way to use this cookbook.
+For more usage examples, have a look to the recipes in `test/cookbooks/hipsnip-solr_test/recipes/`.
 
 ## Attributes
 
-```
-['solr']['version'] = "3.6.2"
-# sha256 sum of the solr archive
-['solr']['checksum'] = "537426dcbdd0dc82dd5bf16b48b6bcaf87cb4049c1245eea8dcb79eeaf3e7ac6"
-# directory where solr archive is downloaded and extracted
-['solr']['directory'] = "/usr/local/src"
+* `node['solr']['version']` - version of Solr, default "3.6.2"
+* `node['solr']['checksum']` - checksum using algo sha256 of the Solr archive, default "537426dcbdd0dc82dd5bf16b48b6bcaf87cb4049c1245eea8dcb79eeaf3e7ac6"
+* `node['solr']['directory']` - directory where Solr archive is downloaded and extracted, default "/usr/local/src"
 
-# Guess by the cookbook if empty
-['solr']['link'] = ""
-['solr']['download'] = ""
-['solr']['extracted'] = ""
-['solr']['war'] = ""
-['solr']['dist'] = ""
+* `node['solr']['home']` - home directory of Solr, all configuration files are there, default "/usr/share/solr".
+* `node['solr']['data']` - directory where indexes are stored, default "/usr/local/solr/data"
 
-# location of solr (configuration files)
-['solr']['home'] = "/usr/share/solr"
-# location of the indexes
-['solr']['data'] = "/usr/local/solr/data"
+* `node['solr']['context_path']` - route where Solr is deployed, default '/solr'
+* `node['solr']['env_vars']` -  variables passed to Solr, default {'solr.solr.home' => node['solr']['home'],'solr.data.dir' => node['solr']['data']}
 
-['solr']['context_path'] = '/solr'
-['solr']['env_vars'] = {
-	'solr.solr.home' => node['solr']['home'],
-	'solr.data.dir' => node['solr']['data']
-}
+* `node['solr']['log']['level']` -  log level, default 'FINE'
+* `node['solr']['log']['class']` - log class used, default 'java.util.logging.ConsoleHandler'. This class logs messages into stdout/stderr.
+* `node['solr']['log']['formatter']` - log formatter used, default 'java.util.logging.SimpleFormatter'
 
-# SEVERE (highest value) WARNING INFO CONFIG FINE FINER FINEST (lowest value)
-['solr']['log']['level'] = 'FINE'
-['solr']['log']['class'] = 'java.util.logging.ConsoleHandler'
-['solr']['log']['formatter'] = 'java.util.logging.SimpleFormatter'
-```
+__Note:__ These attributes don't need to be customized in order to install Solr.
+* `node['solr']['link']` - link used to download Solr archive, if empty "", the recipe guesses the good link
+* `node['solr']['download']` - path of the Solr archive is downloaded, by default empty "". If the link is guessed by the recipe, the recipe does the job.
+* `node['solr']['extracted']` - path of the Solr folder after extractiong, by default empty "". If the link is guessed by the recipe, the recipe does the job.
+* `node['solr']['war']` -  Solr war filename, by default empty "". If the link is guessed by the recipe, the recipe does the job.
+
+
+
 ## Cookbook development
 
 You will need to do a couple of things to be up to speed to hack on this cookbook.
