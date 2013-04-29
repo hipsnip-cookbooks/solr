@@ -118,6 +118,16 @@ directory node['solr']['data'] do
   action :create
 end
 
+################################################################################
+# Export desired Solr environment variables into the attribute node.set['jetty']['java_options']
+
+env_vars_string = ''
+for key in node['solr']['env_vars'].keys.sort do
+  env_vars_string += " -D#{key}=#{node['solr']['env_vars'][key]}"
+end
+
+node.set['jetty']['java_options'] = "#{node['jetty']['java_options']} #{env_vars_string}"
+
 
 ################################################################################
 # Configure
@@ -154,10 +164,11 @@ end
 #   mode  '755'
 # end
 
-template "#{node['jetty']['home']}/etc/logging.properties" do
+logging_properties_file = "#{node['jetty']['home']}/etc/logging.properties"
+template logging_properties_file do
   source 'logging.properties.erb'
   mode '644'
   notifies :restart, "service[jetty]"
 end
 
-node.set['jetty']['java_options'] = node['jetty']['java_options'] + ' -Djava.util.logging.config.file=logging.properties '
+node.set['jetty']['java_options'] =  "#{node['jetty']['java_options']} -Djava.util.logging.config.file=#{logging_properties_file} "
