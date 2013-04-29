@@ -45,6 +45,7 @@ For more usage examples, have a look to the recipes in `test/cookbooks/hipsnip-s
 * `node['solr']['log']['formatter']` - log formatter used, default 'java.util.logging.SimpleFormatter'
 
 __Note:__ These attributes don't need to be customized in order to install Solr.
+
 * `node['solr']['link']` - link used to download Solr archive, if empty "", the recipe guesses the good link
 * `node['solr']['download']` - path of the Solr archive is downloaded, by default empty "". If the link is guessed by the recipe, the recipe does the job.
 * `node['solr']['extracted']` - path of the Solr folder after extractiong, by default empty "". If the link is guessed by the recipe, the recipe does the job.
