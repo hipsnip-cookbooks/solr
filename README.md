@@ -24,7 +24,7 @@ node.set['jetty']['checksum'] = '6ab0c0ba4ff98bfc7399a82a96a047fcd2161ae46622e36
 
 node.set['java']['jdk_version'] = 7
 
-include_recipe 'hipsnip-solr'7
+include_recipe 'hipsnip-solr'
 ```
 
 For more usage examples, have a look to the recipes in `test/cookbooks/hipsnip-solr_test/recipes/`.
