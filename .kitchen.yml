@@ -16,6 +16,13 @@ platforms:
 suites:
 - name: default
   run_list:
+    - recipe[hipsnip-solr_test::default]
+    - recipe[minitest-handler]
+  attributes:
+    minitest:
+      tests: "hipsnip-solr_test/default_test.rb"
+- name: solr-4
+  run_list:
     - recipe[hipsnip-solr_test::solr_4]
     - recipe[minitest-handler]
   attributes:
