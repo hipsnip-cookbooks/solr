@@ -101,7 +101,7 @@ describe_recipe "hipsnip-jetty_test::use_syslog" do
     path = '/var/log/syslog'
     syslog_file_exists = File.exists?(path)
     assert_equal(true,syslog_file_exists)
-    File.new(File.join('','',''),'r') do |file|
+    File.open(path,'r') do |file|
       content = file.read
       assert_equal(true,!!content.match(/solr/))
     end
