@@ -121,12 +121,12 @@ end
 ################################################################################
 # Export desired Solr environment variables into the attribute node.set['jetty']['java_options']
 
-env_vars_string = ''
+solr_env_vars = []
 for key in node['solr']['env_vars'].keys.sort do
-  env_vars_string += " -D#{key}=#{node['solr']['env_vars'][key]}"
+  solr_env_vars.push("-D#{key}=#{node['solr']['env_vars'][key]}")
 end
 
-node.set['jetty']['java_options'] = "#{node['jetty']['java_options']} #{env_vars_string}"
+node.set['jetty']['java_options'] = (node['jetty']['java_options'] + solr_env_vars).uniq
 
 
 ################################################################################
@@ -171,4 +171,4 @@ template logging_properties_file do
   notifies :restart, "service[jetty]"
 end
 
-node.set['jetty']['java_options'] =  "#{node['jetty']['java_options']} -Djava.util.logging.config.file=#{logging_properties_file} "
+node.set['jetty']['java_options'] =  node.set['jetty']['java_options'].push("-Djava.util.logging.config.file=#{logging_properties_file}").uniq
