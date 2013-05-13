@@ -1,7 +1,7 @@
 require File.expand_path('../support/helpers', __FILE__)
 require 'net/http'
 
-describe_recipe "hipsnip-jetty_test::solr_3.6" do
+describe_recipe "hipsnip-jetty_test::solr_4" do
   include Helpers::CookbookTest
 
   # is Jetty up?
