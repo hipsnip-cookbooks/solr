@@ -38,12 +38,12 @@ end
 
 if node['solr']['link'].empty?
   if /^3\.[0-9]{1,}\.[0-9]{1,}/.match(node['solr']['version'])
-    node.default['solr']['link'] = "http://apache.mirrors.timporter.net/lucene/solr/#{node['solr']['version']}/apache-solr-#{node['solr']['version']}.tgz"
+    node.default['solr']['link'] = "http://archive.apache.org/dist/lucene/solr/#{node['solr']['version']}/apache-solr-#{node['solr']['version']}.tgz"
     node.default['solr']['download'] = "#{node['solr']['directory']}/apache-solr-#{node['solr']['version']}.tgz"
     node.default['solr']['extracted'] = "#{node['solr']['directory']}/apache-solr-#{node['solr']['version']}"
     node.default['solr']['war'] = "apache-solr-#{node['solr']['version']}.war"
   elsif /^4\.[0-9]{1,}\.[0-9]{1,}/.match(node['solr']['version'])
-    node.default['solr']['link'] = "http://apache.mirrors.timporter.net/lucene/solr/#{node['solr']['version']}/solr-#{node['solr']['version']}.tgz"
+    node.default['solr']['link'] = "http://archive.apache.org/dist/lucene/solr/#{node['solr']['version']}/solr-#{node['solr']['version']}.tgz"
     node.default['solr']['download'] = "#{node['solr']['directory']}/solr-#{node['solr']['version']}.tgz"
     node.default['solr']['extracted'] = "#{node['solr']['directory']}/solr-#{node['solr']['version']}"
     node.default['solr']['war'] = "solr-#{node['solr']['version']}.war"
