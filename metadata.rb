@@ -7,4 +7,4 @@ long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 supports 		 'ubuntu', ">= 12.04"
 version          "0.4.1"
 
-depends "hipsnip-jetty", "~> 0.8.0"
+depends "hipsnip-jetty", "~> 0.9.0"
