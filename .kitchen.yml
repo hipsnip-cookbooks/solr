@@ -30,13 +30,17 @@ suites:
   attributes:
     minitest:
       tests: "hipsnip-solr_test/solr_4_test.rb"
-- name: solr-3.6-jetty-7
+    java:
+      jdk_version: 7
+- name: solr-3.6-jetty-8
   run_list:
     - recipe[hipsnip-solr_test::solr_3.6]
     - recipe[minitest-handler]
   attributes:
     minitest:
       tests: "hipsnip-solr_test/solr_3.6_test.rb"
+    java:
+      jdk_version: 7
 - name: use-syslog
   run_list:
     - recipe[hipsnip-solr_test::use_syslog]
@@ -44,3 +48,5 @@ suites:
   attributes:
     minitest:
       tests: "hipsnip-solr_test/use_syslog_test.rb"
+    java:
+      jdk_version: 7

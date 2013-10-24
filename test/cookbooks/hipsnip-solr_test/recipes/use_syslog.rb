@@ -10,6 +10,4 @@ node.set['jetty']['syslog']['enable'] = true
 node.set['jetty']['syslog']['priority'] = 'user.notice'
 node.set['jetty']['syslog']['tag'] = 'TEST'
 
-node.set['java']['jdk_version'] = 7
-
 include_recipe 'hipsnip-solr'
