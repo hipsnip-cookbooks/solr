@@ -15,18 +15,27 @@ For example if you want to install Solr 4.2, you could create a cookbook with a 
 
     node.set['solr']['version'] = '4.2.1'
     node.set['solr']['checksum'] = '648a4b2509f6bcac83554ca5958cf607474e81f34e6ed3a0bc932ea7fac40b99'
-  
+
     node.set['jetty']['port'] = 8983
     node.set['jetty']['version'] = '9.0.2.v20130417'
     node.set['jetty']['link'] = 'http://eclipse.org/downloads/download.php?file=/jetty/stable-9/dist/jetty-distribution-9.0.2.v20130417.tar.gz&r=1'
     node.set['jetty']['checksum'] = '6ab0c0ba4ff98bfc7399a82a96a047fcd2161ae46622e36a3552ecf10b9cddb9'
-  
-    node.set['java']['jdk_version'] = 7
 
     include_recipe 'hipsnip-solr'
 
 
-For more usage examples, have a look to the recipes in `test/cookbooks/hipsnip-solr_test/recipes/`.
+> NOTE: Jetty 9 now requires Java 1.7 to be installed. However, the Opscode Java cookbook we use installs version 1.6 by default. To change the version of Java being installed, you'll need to put the following in your Role or Environment config file:
+
+    {
+      "default_attributes": {
+        "java" : {
+          "jdk_version" : 7
+        }
+      }
+    }
+
+
+For more usage examples, have a look at the recipes in `test/cookbooks/hipsnip-solr_test/recipes/`.
 
 ## Attributes
 
