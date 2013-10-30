@@ -104,9 +104,9 @@ end
 
 ruby_block 'Copy ext libs into Jetty' do
   block do
-    lib_files = Dir.glob(File.join(node['solr']['extracted'],'/example/lib/ext') + '**')
+    lib_files = Dir.glob(File.join(node['solr']['extracted'],'/example/lib/ext/') + '**')
     ext_dir = File.join(node['jetty']['home'],'/lib/ext')
-    
+
     Chef::Log.info "Copying #{lib_files} into #{ext_dir}"
     FileUtils.cp_r(lib_files, ext_dir)
     raise "Failed to copy ext lib files" unless !Dir.glob(File.join(ext_dir, 'log4j-*.jar')).empty?
