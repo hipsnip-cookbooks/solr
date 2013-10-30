@@ -114,6 +114,10 @@ ruby_block 'Copy ext libs into Jetty' do
 
   action :create
   notifies :restart, "service[jetty]"
+
+  not_if do
+    !Dir.glob(File.join(node['jetty']['home'],'/lib/ext/','log4j-*.jar')).empty?
+  end
 end
 
 template "#{node['jetty']['contexts']}/solr.xml" do
