@@ -1,9 +1,9 @@
-node.set['solr']['version'] = '4.2.1'
-node.set['solr']['checksum'] = '648a4b2509f6bcac83554ca5958cf607474e81f34e6ed3a0bc932ea7fac40b99'
+node.set['solr']['version'] = '4.5.1'
+node.set['solr']['checksum'] = '8f53f9a317cbb2f0c8304ecf32aa3b8c9a11b5947270ba8d1d6372764d46f781'
 
 node.set['jetty']['port'] = 8983
-node.set['jetty']['version'] = '9.0.3.v20130506'
-node.set['jetty']['link'] = 'http://eclipse.org/downloads/download.php?file=/jetty/9.0.3.v20130506/dist/jetty-distribution-9.0.3.v20130506.tar.gz&r=1'
-node.set['jetty']['checksum'] = 'eff8c9c63883cae04cec82aca01640411a6f8804971932cd477be2f98f90a6c4'
+node.set['jetty']['version'] = '9.0.6.v20130930'
+node.set['jetty']['link'] = 'http://eclipse.org/downloads/download.php?file=/jetty/9.0.6.v20130930/dist/jetty-distribution-9.0.6.v20130930.tar.gz&r=1'
+node.set['jetty']['checksum'] = 'c35c6c0931299688973e936186a6237b69aee2a7912dfcc2494bde9baeeab58f'
 
 include_recipe 'hipsnip-solr'
