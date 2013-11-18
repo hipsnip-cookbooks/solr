@@ -176,7 +176,7 @@ ruby_block 'Copy Solr configurations files' do
       false
     else
       downloaded_signature = `sha256sum #{node['solr']['extracted']}/dist/#{node['solr']['war']} | cut -d ' ' -f 1`
-      installed_signature = `sha256sum #{node['jetty']['webapps']}/#{node['solr']['war']} | cut -d ' ' -f 1`
+      installed_signature = `sha256sum #{war_target_path} cut -d ' ' -f 1`
       downloaded_signature == installed_signature
     end
   end
