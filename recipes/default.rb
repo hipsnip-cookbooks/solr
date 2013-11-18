@@ -79,24 +79,32 @@ end
 ################################################################################
 # Install into Jetty
 
+jetty_major_version = 8
+if /^9.*/.match(node['jetty']['version'])
+  jetty_major_version = 9
+  war_target_path = File.join(node['jetty']['webapps'],'solr.war')
+else
+  war_target_path = File.join(node['jetty']['webapps'],node['solr']['war'])
+end
+
 ruby_block 'Copy Solr war into Jetty webapps folder' do
   block do
-    Chef::Log.info "Copying #{node['solr']['war']} into #{node['jetty']['webapps']}"
+    Chef::Log.info "Copying #{node['solr']['war']} to #{war_target_path}"
 
-    FileUtils.cp(File.join(node['solr']['extracted'],'dist',node['solr']['war']),File.join(node['jetty']['webapps'],node['solr']['war']))
-    FileUtils.chown_R(node['jetty']['user'],node['jetty']['group'],File.join(node['jetty']['webapps'],node['solr']['war']))
-    raise "Failed to copy Solr war" unless File.exists?(File.join(node['jetty']['webapps'],node['solr']['war']))
+    FileUtils.cp(File.join(node['solr']['extracted'],'dist',node['solr']['war']),war_target_path)
+    FileUtils.chown_R(node['jetty']['user'],node['jetty']['group'],war_target_path)
+    raise "Failed to copy Solr war" unless File.exists?(war_target_path)
   end
 
   action :create
   notifies :restart, "service[jetty]"
 
   not_if do
-    if not File.exists?(File.join(node['jetty']['webapps'],node['solr']['war']))
+    if not File.exists?(war_target_path)
       false
     else
       downloaded_signature = `sha256sum #{node['solr']['extracted']}/dist/#{node['solr']['war']} | cut -d ' ' -f 1`
-      installed_signature = `sha256sum #{node['jetty']['webapps']}/#{node['solr']['war']} | cut -d ' ' -f 1`
+      installed_signature = `sha256sum #{war_target_path} | cut -d ' ' -f 1`
       downloaded_signature == installed_signature
     end
   end
@@ -126,6 +134,7 @@ template "#{node['jetty']['contexts']}/solr.xml" do
   mode "644"
   source "solr.context.erb"
   notifies :restart, "service[jetty]"
+  not_if { jetty_major_version > 8 }
 end
 
 directory node['solr']['data'] do
@@ -167,7 +176,7 @@ ruby_block 'Copy Solr configurations files' do
       false
     else
       downloaded_signature = `sha256sum #{node['solr']['extracted']}/dist/#{node['solr']['war']} | cut -d ' ' -f 1`
-      installed_signature = `sha256sum #{node['jetty']['webapps']}/#{node['solr']['war']} | cut -d ' ' -f 1`
+      installed_signature = `sha256sum #{war_target_path} | cut -d ' ' -f 1`
       downloaded_signature == installed_signature
     end
   end
