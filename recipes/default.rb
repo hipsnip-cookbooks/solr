@@ -124,6 +124,7 @@ ruby_block 'Copy ext libs into Jetty' do
   notifies :restart, "service[jetty]"
 
   not_if do
+    /^4\.[1-2]{1,}\.[0-9]{1,}|^[1-3]/.match(node['solr']['version']) ||
     !Dir.glob(File.join(node['jetty']['home'],'/lib/ext/','log4j-*.jar')).empty?
   end
 end
