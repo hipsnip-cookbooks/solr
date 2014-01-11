@@ -37,7 +37,7 @@ end
 # node['solr']['version']
 
 if node['solr']['link'].empty?
-  if /^3\.[0-9]{1,}\.[0-9]{1,}/.match(node['solr']['version'])
+  if /^(?:1\.4\.(?:0|1){1}|3\.[0-9]{1,}\.[0-9]{1,})/.match(node['solr']['version'])
     node.default['solr']['link'] = "http://archive.apache.org/dist/lucene/solr/#{node['solr']['version']}/apache-solr-#{node['solr']['version']}.tgz"
     node.default['solr']['download'] = "#{node['solr']['directory']}/apache-solr-#{node['solr']['version']}.tgz"
     node.default['solr']['extracted'] = "#{node['solr']['directory']}/apache-solr-#{node['solr']['version']}"
@@ -162,11 +162,12 @@ node.set['jetty']['java_options'] = (node['jetty']['java_options'] + solr_env_va
 
 ruby_block 'Copy Solr configurations files' do
   block do
+    solr_xml = node['solr']['version'][0] == '1' ? 'conf/solrconfig.xml' : 'solr.xml'
     config_files = Dir.glob(File.join(node['solr']['extracted'],'/example/solr/') + '**')
     Chef::Log.info "Copying #{config_files} into #{node['solr']['home']}"
     FileUtils.cp_r(config_files, "#{node['solr']['home']}/")
     FileUtils.chown_R(node['jetty']['user'],node['jetty']['group'],node['solr']['home'])
-    raise "Failed to copy Solr configurations files" unless File.exists?(File.join(node['solr']['home'], 'solr.xml'))
+    raise "Failed to copy Solr configurations files" unless File.exists?(File.join(node['solr']['home'], solr_xml))
   end
 
   action :create
